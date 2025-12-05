@@ -253,7 +253,7 @@ int RunTimer(void *unused) {
 	unsigned long threadid;
 	D(bug("SYSTimer: Entering RunTimer loop..."));
 	threadid = SDL_ThreadID();
-	SetTaskPri(threadid, 4);
+	SetTaskPri((Task*)threadid, 4);
 
 	/* get a pointer to an initialized timer request block */
 	tr = create_timer(UNIT_MICROHZ);

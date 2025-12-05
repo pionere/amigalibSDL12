@@ -64,7 +64,7 @@ struct MsgPort *ConPort = NULL;
 */
 #define MOUSE_FUDGE_FACTOR    8
 
-SDL_AmigaNoLowerTaskpri() {
+void SDL_AmigaNoLowerTaskpri() {
 	_sdl_no_lower_taskpri = 1;
 }
 
@@ -194,11 +194,11 @@ static int amiga_DispatchEvent(_THIS, struct IntuiMessage *msg) {
 			this->hidden->oldqual = 0;
 			posted = SDL_PrivateAppActive(1, SDL_APPMOUSEFOCUS);
 			if ( !_sdl_no_lower_taskpri ) {
-				fh = Open("env:SDL_NOLOWERTASKPRI", 1005);
+				fh = (APTR *)Open("env:SDL_NOLOWERTASKPRI", 1005);
 				if ( !fh ) {
 					if ( oldtaskpri == 0 )SetTaskPri(FindTask(0), 0);
 				}
-				if ( fh )Close(fh);
+				if ( fh )Close((BPTR)fh);
 			}
 			break;
 
@@ -207,13 +207,13 @@ static int amiga_DispatchEvent(_THIS, struct IntuiMessage *msg) {
 			this->hidden->window_active = 0;
 			posted = SDL_PrivateAppActive(0, SDL_APPMOUSEFOCUS);
 			if ( !_sdl_no_lower_taskpri ) {
-				fh = Open("env:SDL_NOLOWERTASKPRI", 1005);
+				fh = (APTR *)Open("env:SDL_NOLOWERTASKPRI", 1005);
 				if ( !fh ) {
 					oldtaskpri = SetTaskPri(FindTask(0), -1);
 					if ( oldtaskpri != 0 )SetTaskPri(FindTask(0), oldtaskpri); // only a thread with pri 0 is lower
 
 				}
-				if ( fh )Close(fh);
+				if ( fh )Close((BPTR)fh);
 			}
 			break;
 #if 0
@@ -423,7 +423,7 @@ printf("MapNotify!\n");
 void amiga_PumpEvents(_THIS) {
 	int pending;
 	struct IntuiMessage *m;
-	if ((!SDL_Window) || (!SDL_Window->UserPort))return 0;
+	if ((!SDL_Window) || (!SDL_Window->UserPort)) return;
 	mousex = -16000; // to collect only the last mousepos and detect if a mousemove have come.
 	mousey = -16000;
 	/* Keep processing pending events */

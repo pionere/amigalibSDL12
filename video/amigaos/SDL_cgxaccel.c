@@ -270,7 +270,7 @@ int CGX_FillHWRect(_THIS, SDL_Surface *dst, SDL_Rect *dstrect, Uint32 color) {
 				RectFill(&temprp, dstrect->x, dstrect->y, dstrect->w + dstrect->x, dstrect->h + dstrect->y);
 				this->screen->hwdata->lock = LockBitMapTags(temprp.BitMap, LBMI_BASEADDRESS, (ULONG) & this->screen->pixels,
 															TAG_DONE);
-				return;
+				return 0;
 			}
 			SetAPen(&temprp, color);
 			RectFill(&temprp, dstrect->x, dstrect->y, dstrect->w + dstrect->x, dstrect->h + dstrect->y);

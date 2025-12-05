@@ -38,5 +38,3 @@ extern int SDL_SYS_StartTimer(void);
 
 /* Stop a previously started timer */
 extern void SDL_SYS_StopTimer(void);
-
-extern void amiga_quit_timer(void);

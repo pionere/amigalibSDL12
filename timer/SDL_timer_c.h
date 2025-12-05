@@ -44,3 +44,5 @@ extern void SDL_TimerQuit(void);
 
 /* This function is called from the SDL event thread if it is available */
 extern void SDL_ThreadedTimerCheck(void);
+
+extern void amiga_quit_timer(void);

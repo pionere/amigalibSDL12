@@ -39,7 +39,7 @@
 #if !SDL_VIDEO_DISABLED
 #include "video/SDL_leaks.h"
 #endif
-#include "timer/SDL_systimer.h"
+#include "timer/SDL_timer_c.h"
 #include "mydebug.h"
 
 #if SDL_THREAD_PTH

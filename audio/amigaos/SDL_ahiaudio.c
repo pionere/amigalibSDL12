@@ -65,7 +65,7 @@ static int Audio_Available(void) {
 		if ( req = (struct AHIRequest *)CreateIORequest(p, sizeof(struct AHIRequest))) {
 			req->ahir_Version = 4;
 
-			if ( !OpenDevice(AHINAME, 0, (struct IORequest *)req, NULL)) {
+			if ( !OpenDevice((ULONG)AHINAME, 0, (struct IORequest *)req, NULL)) {
 				D(bug("AHI available.\n"));
 				ok = 1;
 				CloseDevice((struct IORequest *)req);
@@ -283,7 +283,7 @@ static int AHI_OpenAudio(_THIS, SDL_AudioSpec *spec) {
 
 	audio_req[0]->ahir_Version = 4;
 
-	if ( OpenDevice(AHINAME, 0, (struct IORequest *)audio_req[0], NULL)) {
+	if ( OpenDevice((ULONG)AHINAME, 0, (struct IORequest *)audio_req[0], NULL)) {
 		SDL_SetError("Unable to open AHI device!\n");
 		DeleteIORequest((struct IORequest *)audio_req[0]);
 		DeleteMsgPort(audio_port);

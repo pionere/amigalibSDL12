@@ -166,7 +166,7 @@ LONG time_delay(struct timeval *tv, LONG unit) {
 struct timerequest *TimerIO_2;
 struct MsgPort *TimerMP_2;
 
-gettimerbase() {
+void gettimerbase() {
 	long error;
 	atexit(SDL_Quit);
 	if ( TimerMP_2 = CreateMsgPort()) {

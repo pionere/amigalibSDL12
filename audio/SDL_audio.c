@@ -147,7 +147,7 @@ int SDL_RunAudio(void *audiop)
 		audio->ThreadInit(audio);
 	}
 	audio->threadid = SDL_ThreadID();
-    SetTaskPri((Task*)audio->threadid,11);
+    SetTaskPri((struct Task*)audio->threadid,11);
 	/* Set up the mixing function */
 	fill  = audio->spec.callback;
 	udata = audio->spec.userdata;

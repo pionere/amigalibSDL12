@@ -48,6 +48,7 @@ static char rcsid =
 #include "SDL_video.h"
 #include "SDL_mouse.h"
 //#include "SDL_endian.h"
+#include "SDL_thread.h"
 #include "../SDL_sysvideo.h"
 #include "../SDL_pixels_c.h"
 #include "../../events/SDL_events_c.h"
@@ -75,7 +76,7 @@ static char rcsid =
 extern "C" {
 #endif
 
-unsigned long _sdl_windowaddr;
+struct Window *_sdl_windowaddr;
 
 /* Initialization/Query functions */
 static int CGX_VideoInit(_THIS, SDL_PixelFormat *vformat);
@@ -106,7 +107,7 @@ void SDL_AmigaUnlockWindow() {
 }
 
 struct Window *SDL_AmigaWindowAddr(void) {
-	return (struct Window *)_sdl_windowaddr;
+	return _sdl_windowaddr;
 }
 
 int CGX_SetGamma(_THIS, float red, float green, float blue) {
@@ -114,7 +115,7 @@ int CGX_SetGamma(_THIS, float red, float green, float blue) {
 	return -1;
 }
 
-int CGX_GetGamma(_THIS, float red, float green, float blue) {
+int CGX_GetGamma(_THIS, float *red, float *green, float *blue) {
 	SDL_SetError("Gamma correction not supported");
 	return -1;
 }
@@ -558,25 +559,25 @@ static int CGX_VideoInit(_THIS, SDL_PixelFormat *vformat) {
 		Uint32 okid = INVALID_ID;
 		if ( bpp == 32 ) {
 			UWORD pixfmt[] = { PIXFMT_BGRA32, -1 };
-			unsigned long *ret;
+			struct List *ret;
 			struct CyberModeNode *cnode;
 			ret = AllocCModeListTags(CYBRMREQ_MinWidth, SDL_Display->Width, CYBRMREQ_MinHeight, SDL_Display->Height,
 									 CYBRMREQ_MaxWidth, SDL_Display->Width + 1000, CYBRMREQ_MaxHeight, SDL_Display->Height + 1000,
-									 CYBRMREQ_MaxDepth, bpp, CYBRMREQ_MinDepth, bpp, CYBRMREQ_CModelArray, &pixfmt);
+									 CYBRMREQ_MaxDepth, bpp, CYBRMREQ_MinDepth, bpp, CYBRMREQ_CModelArray, (ULONG)&pixfmt);
 			if ( ret ) {
-				cnode = *ret;
+				cnode = (CyberModeNode *)*ret;
 				if ( cnode )okid = cnode->DisplayID;
 			}
 		}
 		if ( bpp == 16 ) {
 			UWORD pixfmt[] = { PIXFMT_RGB16, -1 };
-			unsigned long *ret;
+			struct List *ret;
 			struct CyberModeNode *cnode;
 			ret = AllocCModeListTags(CYBRMREQ_MinWidth, SDL_Display->Width, CYBRMREQ_MinHeight, SDL_Display->Height,
 									 CYBRMREQ_MaxWidth, SDL_Display->Width + 1000, CYBRMREQ_MaxHeight, SDL_Display->Height + 1000,
-									 CYBRMREQ_MaxDepth, bpp, CYBRMREQ_MinDepth, 16, CYBRMREQ_CModelArray, &pixfmt);
+									 CYBRMREQ_MaxDepth, bpp, CYBRMREQ_MinDepth, 16, CYBRMREQ_CModelArray, (ULONG)&pixfmt);
 			if ( ret ) {
-				cnode = *ret;
+				cnode = (CyberModeNode *)*ret;
 				if ( cnode )okid = cnode->DisplayID;
 			}
 		}
@@ -598,7 +599,7 @@ static int CGX_VideoInit(_THIS, SDL_PixelFormat *vformat) {
 			GFX_Display = OpenScreenTags(NULL,
 					//SA_Width,SDL_Display->Width,
 					//SA_Height,SDL_Display->Height,
-										 SA_Title, "SDL Screen",
+										 SA_Title, (ULONG)"SDL Screen",
 										 SA_Depth, bpp, SA_Quiet, TRUE,
 										 SA_ShowTitle, FALSE,
 										 SA_DisplayID, okid,
@@ -655,7 +656,7 @@ static int CGX_VideoInit(_THIS, SDL_PixelFormat *vformat) {
 			return -1;
 		}
 
-		if ( !GetDisplayInfoData(handle, (char *)&info, sizeof(struct DisplayInfo), DTAG_DISP, NULL)) {
+		if ( !GetDisplayInfoData(handle, (char *)&info, sizeof(struct DisplayInfo), DTAG_DISP, 0L)) {
 			D(bug("Unable to get visual info data...\n"));
 			return -1;
 		}
@@ -720,7 +721,7 @@ void CGX_DestroyWindow(_THIS, SDL_Surface *screen) {
 			CloseWindow(SDL_Window);
 			if ( SDL_Window_Background)CloseWindow(SDL_Window_Background);
 			SDL_Window = NULL;
-			_sdl_windowaddr = 0;
+			_sdl_windowaddr = NULL;
 			SDL_Window_Background = NULL;
 
 		}
@@ -805,7 +806,7 @@ int CGX_CreateWindow(_THIS, SDL_Surface *screen,
 		if ( !(handle = FindDisplayInfo(SDL_Visual)))
 			return -1;
 
-		if ( !GetDisplayInfoData(handle, (char *)&info, sizeof(struct DisplayInfo), DTAG_DISP, NULL))
+		if ( !GetDisplayInfoData(handle, (char *)&info, sizeof(struct DisplayInfo), DTAG_DISP, 0L))
 			return -1;
 
 		form = GetCyberIDAttr(CYBRIDATTR_PIXFMT, SDL_Visual);
@@ -1108,26 +1109,26 @@ static SDL_Surface *CGX_SetVideoMode(_THIS, SDL_Surface *current,
 				}*/
 				if ( bpp == 32 ) {
 					UWORD pixfmt[] = { PIXFMT_BGRA32, -1 };
-					unsigned long *ret;
+					struct List *ret;
 					struct CyberModeNode *cnode;
 					ret = AllocCModeListTags(CYBRMREQ_MinWidth, width, CYBRMREQ_MinHeight, height,
 											 CYBRMREQ_MaxWidth, width + 1000, CYBRMREQ_MaxHeight, height + 1000,
-											 CYBRMREQ_MaxDepth, bpp, CYBRMREQ_MinDepth, 32, CYBRMREQ_CModelArray, (&pixfmt), TAG_END);
+											 CYBRMREQ_MaxDepth, bpp, CYBRMREQ_MinDepth, 32, CYBRMREQ_CModelArray, (ULONG)&pixfmt, TAG_END);
 					if ( ret ) {
-						cnode = *ret;
+						cnode = (CyberModeNode *)*ret;
 						if ( cnode )okid = cnode->DisplayID;
 					}
 				}
 				//if (bpp == 16)
 //		{
 //			UWORD pixfmt[] ={PIXFMT_RGB16,-1};
-//		  unsigned long *ret;
+//		  struct List *ret;
 //          struct CyberModeNode * cnode;
 //		  ret = AllocCModeListTags(CYBRMREQ_MinWidth,width,CYBRMREQ_MinHeight,height,
 //			  CYBRMREQ_MaxWidth,width+1000,CYBRMREQ_MaxHeight,height+1000,
-//			  CYBRMREQ_MaxDepth,bpp,CYBRMREQ_MinDepth,16,CYBRMREQ_CModelArray,&pixfmt,TAG_END);
+//			  CYBRMREQ_MaxDepth,bpp,CYBRMREQ_MinDepth,16,CYBRMREQ_CModelArray,(ULONG)&pixfmt,TAG_END);
 //			  if (ret)
-//					{cnode = *ret;
+//					{cnode = (CyberModeNode *)*ret;
 //					if (cnode)okid = cnode->DisplayID;
 //					}
 //		if (!IsCyberModeID(okid))okid = INVALID_ID;
@@ -1167,7 +1168,7 @@ static SDL_Surface *CGX_SetVideoMode(_THIS, SDL_Surface *current,
 													 SA_Left, 0,
 													 SA_Width, swidth + 1,
 													 SA_Height, sheight * 2 + 2,
-													 SA_Title, "AMMX SDL Screen",
+													 SA_Title, (ULONG)"AMMX SDL Screen",
 //								SA_Quiet,TRUE,SA_ShowTitle,FALSE,
 													 SA_AutoScroll, FALSE,
 													 SA_Draggable, FALSE,
@@ -1185,7 +1186,7 @@ static SDL_Surface *CGX_SetVideoMode(_THIS, SDL_Surface *current,
 						GFX_Display = OpenScreenTags(NULL,
 								//SA_Width,width,
 								//SA_Height,height,
-													 SA_Title, "SDL Screen",
+													 SA_Title, (ULONG)"SDL Screen",
 													 SA_Quiet, TRUE, SA_ShowTitle, FALSE,
 													 SA_Depth, bpp,
 													 SA_DisplayID, okid,

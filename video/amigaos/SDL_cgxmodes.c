@@ -38,6 +38,7 @@ static char rcsid =
 #include "../../events/SDL_events_c.h"
 #include "SDL_cgxvideo.h"
 #include "SDL_cgxwm_c.h"
+#include "SDL_cgximage_c.h"
 #include "SDL_cgxmodes_c.h"
 
 #include "../../mydebug.h"

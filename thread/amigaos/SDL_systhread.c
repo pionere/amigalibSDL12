@@ -253,14 +253,14 @@ void SDL_SYS_WaitThread(SDL_Thread *thread) {
 		for ( n = t->lh_Head;
 			  n;
 			  n = n->ln_Succ )
-			if ( thread->handle == n )found = 1;
+			if ( (struct Node *)thread->handle == n )found = 1;
 		t = &SysBase->TaskReady;
 
 		for ( n = t->lh_Head;
 			  n;
 			  n = n->ln_Succ )
-			if ( thread->handle == n )found = 1;
-		if ( FindTask(0) == n )found = 1;
+			if ( (struct Node *)thread->handle == n )found = 1;
+		if ( (struct Node *)FindTask(0) == n )found = 1;
 		Enable();
 
 

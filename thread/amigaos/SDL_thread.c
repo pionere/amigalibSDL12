@@ -35,7 +35,7 @@ static char rcsid =
 #include "SDL_mutex.h"
 #include "SDL_thread.h"
 #include "../SDL_thread_c.h"
-//#include "SDL_systhread.h"
+#include "../SDL_systhread.h"
 
 #define ARRAY_CHUNKSIZE    32
 /* The array of threads currently active in the application

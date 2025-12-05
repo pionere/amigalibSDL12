@@ -565,7 +565,7 @@ static int CGX_VideoInit(_THIS, SDL_PixelFormat *vformat) {
 									 CYBRMREQ_MaxWidth, SDL_Display->Width + 1000, CYBRMREQ_MaxHeight, SDL_Display->Height + 1000,
 									 CYBRMREQ_MaxDepth, bpp, CYBRMREQ_MinDepth, bpp, CYBRMREQ_CModelArray, (ULONG)&pixfmt);
 			if ( ret ) {
-				cnode = (CyberModeNode *)*ret;
+				cnode = (struct CyberModeNode *)*ret;
 				if ( cnode )okid = cnode->DisplayID;
 			}
 		}
@@ -577,7 +577,7 @@ static int CGX_VideoInit(_THIS, SDL_PixelFormat *vformat) {
 									 CYBRMREQ_MaxWidth, SDL_Display->Width + 1000, CYBRMREQ_MaxHeight, SDL_Display->Height + 1000,
 									 CYBRMREQ_MaxDepth, bpp, CYBRMREQ_MinDepth, 16, CYBRMREQ_CModelArray, (ULONG)&pixfmt);
 			if ( ret ) {
-				cnode = (CyberModeNode *)*ret;
+				cnode = (struct CyberModeNode *)*ret;
 				if ( cnode )okid = cnode->DisplayID;
 			}
 		}
@@ -1115,7 +1115,7 @@ static SDL_Surface *CGX_SetVideoMode(_THIS, SDL_Surface *current,
 											 CYBRMREQ_MaxWidth, width + 1000, CYBRMREQ_MaxHeight, height + 1000,
 											 CYBRMREQ_MaxDepth, bpp, CYBRMREQ_MinDepth, 32, CYBRMREQ_CModelArray, (ULONG)&pixfmt, TAG_END);
 					if ( ret ) {
-						cnode = (CyberModeNode *)*ret;
+						cnode = (struct CyberModeNode *)*ret;
 						if ( cnode )okid = cnode->DisplayID;
 					}
 				}
@@ -1128,7 +1128,7 @@ static SDL_Surface *CGX_SetVideoMode(_THIS, SDL_Surface *current,
 //			  CYBRMREQ_MaxWidth,width+1000,CYBRMREQ_MaxHeight,height+1000,
 //			  CYBRMREQ_MaxDepth,bpp,CYBRMREQ_MinDepth,16,CYBRMREQ_CModelArray,(ULONG)&pixfmt,TAG_END);
 //			  if (ret)
-//					{cnode = (CyberModeNode *)*ret;
+//					{cnode = (struct CyberModeNode *)*ret;
 //					if (cnode)okid = cnode->DisplayID;
 //					}
 //		if (!IsCyberModeID(okid))okid = INVALID_ID;

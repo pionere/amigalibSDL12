@@ -125,7 +125,7 @@ int CGX_GetVideoModes(_THIS) {
 			if ( h = FindDisplayInfo(nextid)) {
 				struct DimensionInfo info;
 
-				if ( GetDisplayInfoData(h, (char *)&info, sizeof(struct DimensionInfo), DTAG_DIMS, NULL)) {
+				if ( GetDisplayInfoData(h, (char *)&info, sizeof(struct DimensionInfo), DTAG_DIMS, 0L)) {
 					int ok = 0;
 
 					for ( i = 0; i < nmodes; i++ ) {
